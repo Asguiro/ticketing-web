@@ -1,0 +1,51 @@
+---
+description: Déploiement du frontend React Router v7 SSR sur Vercel
+globs:
+alwaysApply: false
+---
+
+# Déploiement - Vercel SSR
+
+## Build SSR
+
+- Utiliser un déploiement compatible React Router v7 framework mode SSR.
+- Ne pas désactiver SSR avec `ssr: false`.
+- Vérifier que le preset/adapter Vercel est correctement configuré selon la version du projet.
+- Tester le build localement avant remise.
+
+## Variables d'environnement
+
+Variables côté frontend SSR :
+
+- `API_URL` ou `SERVER_API_URL` : URL publique de l'API Render.
+- `SESSION_SECRET` : secret fort pour signer les cookies de session.
+- Éventuellement `NODE_ENV=production`.
+
+Éviter d'utiliser `VITE_API_URL` pour les appels serveur si l'API est uniquement appelée
+depuis les loaders/actions. Les variables `VITE_*` sont exposées au navigateur.
+
+## Cookies de session
+
+En production :
+
+- `httpOnly: true`
+- `secure: true`
+- `sameSite: 'lax'`
+- `path: '/'`
+- secret fort, jamais commité
+
+## API Render
+
+- L'API doit être accessible depuis Vercel.
+- Le premier appel peut être lent si Render est en veille sur une offre gratuite : prévoir un état de chargement propre.
+- Si des appels navigateur directs existent malgré SSR, configurer CORS côté API pour le domaine Vercel.
+
+## Checklist avant remise
+
+- Le frontend est accessible publiquement.
+- Les loaders SSR fonctionnent en navigation privée.
+- Les trois rôles client/agent/admin peuvent se connecter.
+- Les pages protégées redirigent correctement si la session est absente.
+- Les actions importantes fonctionnent : création ticket, message, assignation, changement de statut.
+- Les erreurs `403` et `409` sont affichées proprement.
+- Aucune clé secrète ou token n'apparaît dans le bundle navigateur.

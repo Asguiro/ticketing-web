@@ -1,0 +1,25 @@
+---
+description: Tests, lint, formatage et conventions de commit (repo frontend)
+globs:
+alwaysApply: false
+---
+
+# Qualité & tests - frontend
+
+## Tests
+- Vitest + Testing Library, ciblés sur la logique conditionnelle par rôle (affichage
+  des actions selon `client`/`agent`/`admin`) et sur le client API (gestion des erreurs
+  401/403/409), plutôt qu'une couverture exhaustive de tous les composants vu le temps
+  imparti.
+- Un test par comportement critique : redirection si non authentifié, message affiché
+  sur conflit d'assignation (409), masquage des actions non permises.
+
+## Lint & format
+- ESLint + Prettier.
+- `strict: true` dans `tsconfig.json`, pas de `any` implicite.
+- Husky + lint-staged en pre-commit si le temps le permet.
+
+## Conventions de commit
+- Commits conventionnels (`feat:`, `fix:`, `refactor:`, `docs:`, `test:`, `chore:`),
+  cohérents sur tout le repo.
+- Un commit = un changement logique, messages explicites.

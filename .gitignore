@@ -2,6 +2,9 @@
 .env
 /node_modules/
 
+# Cursor debug logs
+.cursor/*.log
+
 # React Router
 /.react-router/
 /build/

@@ -1,0 +1,255 @@
+---
+description: Conventions frontend React Router v7 SSR - routes explicites, loaders/actions séparés, pages propres
+globs: app/**/*.tsx, app/**/*.ts
+alwaysApply: false
+---
+
+# React Router v7 SSR - conventions obligatoires
+
+## Mode React Router
+
+- Utiliser React Router v7 en **framework mode avec SSR activé**.
+- Ne pas configurer `ssr: false`.
+- Utiliser `app/routes.ts` comme point central de déclaration des routes.
+- Déclarer les groupes de routes avec `layout`, `prefix`, `index`, `route` depuis `@react-router/dev/routes`.
+- Garder des fichiers `router/*Routes.ts` par domaine quand cela améliore la lisibilité, comme dans l'architecture de référence fournie.
+
+Exemple attendu :
+
+```ts
+// app/routes.ts
+import { layout, index, prefix, type RouteConfig } from '@react-router/dev/routes';
+import ticketRoutes from './router/ticketRoutes';
+
+export default [
+  layout('./components/layouts/DashboardLayout.tsx', [
+    ...prefix('dashboard', [
+      index('./pages/dashboard/Home.tsx'),
+      ...ticketRoutes,
+    ]),
+  ]),
+] satisfies RouteConfig;
+```
+
+## Structure frontend attendue
+
+L'architecture doit rester proche de cette séparation :
+
+```txt
+app/
+  routes.ts
+  router/
+    ticketRoutes.ts
+    userRoutes.ts
+  pages/
+    tickets/
+      TicketsListPage.tsx
+      TicketDetailPage.tsx
+      TicketCreatePage.tsx
+      components/
+        TicketFilters.tsx
+        TicketStatusBadge.tsx
+  components/
+    layouts/
+    ui/
+    shared/
+  server/
+    auth/
+      session.server.ts
+      require-auth.server.ts
+    api/
+      api-client.server.ts
+      ticket-api.server.ts
+      user-api.server.ts
+    tickets/
+      loaders/
+        ticket.server.ts
+      actions/
+        ticket.server.ts
+      schema/
+        ticket.schema.ts
+  types/
+    ticket.ts
+    user.ts
+```
+
+## Règle principale : séparation loaders/actions
+
+Pour chaque domaine ou page qui charge ou modifie des données, créer un dossier dédié dans
+`app/server/<domaine>/`.
+
+- Si la page contient un `loader`, créer :
+  `app/server/<domaine>/loaders/<nom>.server.ts`
+- Si la page contient une `action`, créer :
+  `app/server/<domaine>/actions/<nom>.server.ts`
+- Si une page n'a pas d'action, ne pas créer de fichier action vide.
+- Si une page n'a pas de loader, ne pas créer de fichier loader vide.
+- Toujours suffixer les fichiers serveur par `.server.ts`.
+
+Exemple pour les tickets :
+
+```txt
+app/server/tickets/loaders/ticket.server.ts
+app/server/tickets/actions/ticket.server.ts
+```
+
+La page React Router ne doit faire que brancher les fonctions :
+
+```ts
+// app/pages/tickets/TicketDetailPage.tsx
+import type { ActionFunctionArgs, LoaderFunctionArgs } from 'react-router';
+import { ticketDetailLoader } from '~/server/tickets/loaders/ticket.server';
+import { ticketDetailAction } from '~/server/tickets/actions/ticket.server';
+
+export async function loader(args: LoaderFunctionArgs) {
+  return ticketDetailLoader(args);
+}
+
+export async function action(args: ActionFunctionArgs) {
+  return ticketDetailAction(args);
+}
+
+export default function TicketDetailPage() {
+  // UI uniquement : useLoaderData, useFetcher, Form, rendu visuel.
+}
+```
+
+## Contenu autorisé dans un fichier page
+
+Un fichier dans `app/pages/**` peut contenir :
+
+- Le composant React de la page.
+- Des sous-composants purement visuels courts.
+- Des hooks React d'affichage (`useLoaderData`, `useNavigation`, `useFetcher`, `useSearchParams`).
+- Des exports `loader`/`action` très courts qui délèguent vers `app/server/**`.
+
+Un fichier dans `app/pages/**` ne doit pas contenir :
+
+- Un appel direct à l'API externe.
+- Une lecture/écriture de session.
+- Une validation complète de `FormData`.
+- Une logique métier de statut, SLA ou permission.
+- Une mutation serveur directement codée dans la page.
+
+## Loaders SSR
+
+Les loaders SSR doivent :
+
+- Lire la session depuis le cookie de la requête.
+- Vérifier l'authentification et le rôle avec une fonction server-only (`requireAuth`, `requireRole`, etc.).
+- Appeler l'API via `app/server/api/*.server.ts`.
+- Lire les filtres, tri et pagination depuis les `searchParams`.
+- Retourner des données prêtes pour l'UI, typées, sans exposer de token.
+- Utiliser `data()` ou `redirect()` de React Router quand nécessaire.
+
+Exemple :
+
+```ts
+// app/server/tickets/loaders/ticket.server.ts
+import type { LoaderFunctionArgs } from 'react-router';
+import { data, redirect } from 'react-router';
+import { requireAuth } from '~/server/auth/require-auth.server';
+import { getTickets, getTicketById } from '~/server/api/ticket-api.server';
+
+export async function ticketsListLoader({ request }: LoaderFunctionArgs) {
+  const session = await requireAuth(request, ['client', 'agent', 'admin']);
+  const url = new URL(request.url);
+
+  const result = await getTickets(session.accessToken, {
+    status: url.searchParams.get('status') ?? undefined,
+    priority: url.searchParams.get('priority') ?? undefined,
+    assignedAgentId: url.searchParams.get('agent') ?? undefined,
+    page: Number(url.searchParams.get('page') ?? 1),
+  });
+
+  return data({ user: session.user, tickets: result.items, pagination: result.pagination });
+}
+
+export async function ticketDetailLoader({ request, params }: LoaderFunctionArgs) {
+  const session = await requireAuth(request, ['client', 'agent', 'admin']);
+  const ticketId = params.ticketId;
+  if (!ticketId) throw new Response('Ticket introuvable', { status: 400 });
+
+  const ticket = await getTicketById(session.accessToken, ticketId);
+  return data({ user: session.user, ticket });
+}
+```
+
+## Actions SSR
+
+Les actions SSR doivent :
+
+- Lire la session et vérifier le rôle.
+- Lire et valider le `FormData` côté serveur.
+- Utiliser un champ `intent` pour distinguer plusieurs mutations sur une même page.
+- Appeler l'API via `app/server/api/*.server.ts`.
+- Retourner `redirect`, `data` ou une erreur métier claire.
+- Gérer les erreurs `401`, `403`, `409` sans crash silencieux.
+
+Exemple :
+
+```ts
+// app/server/tickets/actions/ticket.server.ts
+import type { ActionFunctionArgs } from 'react-router';
+import { data, redirect } from 'react-router';
+import { requireAuth } from '~/server/auth/require-auth.server';
+import { createTicket, assignTicket, addTicketMessage } from '~/server/api/ticket-api.server';
+
+export async function ticketDetailAction({ request, params }: ActionFunctionArgs) {
+  const session = await requireAuth(request, ['agent', 'admin', 'client']);
+  const formData = await request.formData();
+  const intent = String(formData.get('intent') ?? '');
+  const ticketId = params.ticketId;
+
+  if (!ticketId) throw new Response('Ticket introuvable', { status: 400 });
+
+  if (intent === 'assign_ticket') {
+    await assignTicket(session.accessToken, ticketId, String(formData.get('agentId') ?? ''));
+    return data({ ok: true });
+  }
+
+  if (intent === 'add_message') {
+    await addTicketMessage(session.accessToken, ticketId, String(formData.get('message') ?? ''));
+    return data({ ok: true });
+  }
+
+  throw new Response('Action inconnue', { status: 400 });
+}
+
+export async function ticketCreateAction({ request }: ActionFunctionArgs) {
+  const session = await requireAuth(request, ['client', 'admin']);
+  const formData = await request.formData();
+  const ticket = await createTicket(session.accessToken, formData);
+  return redirect(`/dashboard/tickets/${ticket.id}`);
+}
+```
+
+## Auth SSR
+
+- Ne pas utiliser `localStorage` pour les tokens.
+- Ne pas mettre de token dans les composants React.
+- Utiliser une session côté frontend basée sur cookie `httpOnly`, `sameSite: 'lax'`, `secure` en production.
+- Les loaders/actions récupèrent l'access token depuis la session et appellent l'API en `Authorization: Bearer`.
+- Prévoir le refresh token côté serveur si l'access token expire.
+- Le layout protégé doit bloquer réellement l'accès via loader SSR, pas seulement masquer l'interface.
+
+## Formulaires et revalidation
+
+- Utiliser `<Form method="post">` pour les mutations classiques.
+- Utiliser `useFetcher()` pour les actions ponctuelles sans navigation : assignation, changement de statut, ajout de message.
+- Après mutation, laisser React Router revalider les loaders quand c'est possible.
+- Les filtres de liste doivent vivre dans l'URL (`searchParams`) pour rester partageables et compatibles SSR.
+
+## Erreurs UI
+
+- `401` : redirection vers login ou renouvellement de session serveur.
+- `403` : message clair d'accès refusé.
+- `409` : message métier clair, par exemple : “ce ticket vient d'être pris par un autre agent”.
+- `404` : page introuvable propre.
+- Ajouter une `ErrorBoundary` sur les pages importantes.
+
+## Style et qualité
+
+- TypeScript strict, pas de `any` implicite.
+- Composants UI réutilisables dans `components/ui` et `components/shared`.
+- Pages lisibles : éviter les fichiers géants. Extraire les tableaux, filtres, badges et modales dans `components`.

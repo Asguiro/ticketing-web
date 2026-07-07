@@ -1,0 +1,98 @@
+---
+description: Intégration SSR avec l'API externe - client server-only, contrat, types, erreurs
+globs: app/server/api/**/*.ts, app/server/**/*.server.ts, app/types/**/*.ts
+alwaysApply: false
+---
+
+# Intégration avec l'API externe en SSR
+
+L'API (`ticketing-api`) est un repo et un déploiement séparés. Le frontend React Router
+SSR agit comme une couche web serveur qui appelle cette API depuis ses loaders/actions.
+
+## Source de vérité du contrat
+
+- La documentation Swagger de l'API (`<API_URL>/api/docs`) et les DTO du repo API sont la référence.
+- Les enums doivent rester identiques côté frontend : `TicketStatus`, `TicketPriority`, `Role`.
+- Si le contrat API change, mettre à jour les types frontend et les wrappers `app/server/api/*.server.ts`.
+- Ne pas inventer de champs “au cas où”.
+
+## Configuration SSR
+
+- L'URL API doit être pilotée par variable d'environnement serveur, par exemple `API_URL` ou `SERVER_API_URL`.
+- Ne pas exposer une URL ou un secret sensible via une variable client inutile.
+- Si une variable est préfixée `VITE_*`, considérer qu'elle est visible dans le navigateur.
+- Les tokens utilisateurs viennent de la session SSR, pas de `localStorage`.
+
+## Client API server-only
+
+Créer un client centralisé :
+
+```txt
+app/server/api/api-client.server.ts
+```
+
+Ce client doit gérer :
+
+- `baseUrl` depuis l'environnement.
+- Header `Authorization: Bearer <accessToken>`.
+- `Accept: application/json` et `Content-Type` si nécessaire.
+- Sérialisation JSON et FormData.
+- Timeout raisonnable.
+- Normalisation des erreurs API.
+- Mapping propre des statuts `401`, `403`, `404`, `409`, `422`, `500`.
+
+Aucun composant React ne doit faire directement :
+
+```ts
+fetch(`${API_URL}/...`)
+```
+
+## Wrappers API par domaine
+
+Chaque domaine expose des fonctions typées :
+
+```txt
+app/server/api/ticket-api.server.ts
+app/server/api/user-api.server.ts
+app/server/api/dashboard-api.server.ts
+```
+
+Exemple :
+
+```ts
+// app/server/api/ticket-api.server.ts
+import { apiRequest } from './api-client.server';
+import type { Ticket, TicketListParams, PaginatedResult } from '~/types/ticket';
+
+export function getTickets(accessToken: string, params: TicketListParams) {
+  return apiRequest<PaginatedResult<Ticket>>('/tickets', {
+    method: 'GET',
+    accessToken,
+    params,
+  });
+}
+
+export function assignTicket(accessToken: string, ticketId: string, agentId: string) {
+  return apiRequest(`/tickets/${ticketId}/assign`, {
+    method: 'POST',
+    accessToken,
+    body: { agentId },
+  });
+}
+```
+
+## Gestion des erreurs métier
+
+- `401` : session expirée, tenter refresh côté serveur si disponible, sinon redirect login.
+- `403` : action interdite, afficher un message clair.
+- `409` : conflit métier, notamment double assignation concurrente.
+- `422` : validation serveur, renvoyer les erreurs de champs à la page.
+- `500` : erreur inattendue, `ErrorBoundary` ou message de fallback propre.
+
+Les actions/loaders ne doivent pas masquer une erreur métier importante avec un simple `console.log`.
+
+## CORS
+
+En SSR, les loaders/actions appellent l'API depuis le serveur du frontend. Les appels
+principaux ne sont donc pas bloqués par le CORS navigateur. Ne pas multiplier les appels
+API directs depuis le navigateur sauf nécessité explicite.

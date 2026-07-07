@@ -1,4 +1,48 @@
 @import "tailwindcss";
+@plugin "daisyui";
+@plugin "daisyui/theme" {
+  name: "msk";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+
+  --color-base-100: oklch(99% 0.01 275);
+  --color-base-200: oklch(96% 0.02 275);
+  --color-base-300: oklch(92% 0.03 275);
+  --color-base-content: oklch(28% 0.04 275);
+
+  --color-primary: oklch(58% 0.18 275);
+  --color-primary-content: oklch(98% 0.01 275);
+
+  --color-secondary: oklch(72% 0.12 295);
+  --color-secondary-content: oklch(98% 0.01 295);
+
+  --color-accent: oklch(70% 0.14 230);
+  --color-accent-content: oklch(98% 0.01 230);
+
+  --color-neutral: oklch(40% 0.03 275);
+  --color-neutral-content: oklch(98% 0.01 275);
+
+  --color-info: oklch(68% 0.12 240);
+  --color-info-content: oklch(98% 0.01 240);
+
+  --color-success: oklch(68% 0.14 150);
+  --color-success-content: oklch(98% 0.01 150);
+
+  --color-warning: oklch(80% 0.14 85);
+  --color-warning-content: oklch(28% 0.05 85);
+
+  --color-error: oklch(62% 0.2 25);
+  --color-error-content: oklch(98% 0.01 25);
+
+  --radius-selector: 1rem;
+  --radius-field: 0.75rem;
+  --radius-box: 1.25rem;
+
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
@@ -7,9 +51,23 @@
 
 html,
 body {
-  @apply bg-white dark:bg-gray-950;
+  @apply min-h-full bg-base-200 text-base-content;
+}
 
-  @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
+.stat-gradient-card {
+  background: linear-gradient(135deg, oklch(62% 0.2 275), oklch(58% 0.16 250));
+  color: white;
+}
+
+.glass-panel {
+  @apply rounded-box border border-base-300/60 bg-base-100/90 shadow-lg backdrop-blur-sm;
+}
+
+@keyframes loading-bar {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(420%);
   }
 }

@@ -1,0 +1,178 @@
+---
+description: Architecture server-only SSR frontend - dossiers loaders/actions par domaine ou page
+globs: app/server/**/*.ts, app/pages/**/*.tsx, app/router/**/*.ts, app/routes.ts
+alwaysApply: false
+---
+
+# Architecture server-only SSR
+
+Cette règle complète `010-react-router.mdc` et doit être appliquée dès qu'une page React
+Router utilise un `loader`, une `action`, une session, ou un appel API.
+
+## Organisation obligatoire dans `app/server`
+
+Regrouper la logique serveur par domaine fonctionnel, pas dans un seul fichier global.
+
+```txt
+app/server/
+  auth/
+    session.server.ts
+    require-auth.server.ts
+    redirect.server.ts
+  api/
+    api-client.server.ts
+    ticket-api.server.ts
+    user-api.server.ts
+    dashboard-api.server.ts
+  tickets/
+    loaders/
+      ticket.server.ts
+    actions/
+      ticket.server.ts
+    schema/
+      ticket.schema.ts
+  dashboard/
+    loaders/
+      dashboard.server.ts
+  users/
+    loaders/
+      user.server.ts
+    actions/
+      user.server.ts
+```
+
+Le nom du domaine doit suivre la page ou la feature : `tickets`, `users`, `dashboard`,
+`auth`, `messages`, etc. Pour une feature existante en français, conserver le nom actuel
+si cela évite de casser le projet : `auto-ecoles`, `moniteurs`, `vehicules`.
+
+## Règle de nommage
+
+- Fichier server-only : toujours `*.server.ts`.
+- Loader d'un domaine : `app/server/<domaine>/loaders/<domaine-singulier>.server.ts`.
+- Action d'un domaine : `app/server/<domaine>/actions/<domaine-singulier>.server.ts`.
+- API wrapper : `app/server/api/<domaine>-api.server.ts`.
+- Schéma de validation : `app/server/<domaine>/schema/<domaine>.schema.ts`.
+
+Exemples :
+
+```txt
+app/server/tickets/loaders/ticket.server.ts
+app/server/tickets/actions/ticket.server.ts
+app/server/users/loaders/user.server.ts
+app/server/users/actions/user.server.ts
+app/server/dashboard/loaders/dashboard.server.ts
+```
+
+## Responsabilités par dossier
+
+### `app/server/api`
+
+Contient les fonctions HTTP vers l'API externe.
+
+Autorisé :
+
+- Construire l'URL API.
+- Ajouter le header `Authorization`.
+- Normaliser les erreurs API.
+- Gérer timeout/retry raisonnable.
+- Typer les réponses.
+
+Interdit :
+
+- Lire directement `FormData` d'une page.
+- Lire directement les `params` d'une route.
+- Connaître les composants React.
+
+### `app/server/<domaine>/loaders`
+
+Contient la préparation des données de page.
+
+Autorisé :
+
+- Lire `request.url`, `params`, `searchParams`.
+- Vérifier session/rôle.
+- Appeler `app/server/api`.
+- Mapper la réponse API vers une forme facile à consommer par la page.
+
+Interdit :
+
+- Modifier des données.
+- Contenir une mutation déguisée en GET.
+- Retourner un token à l'UI.
+
+### `app/server/<domaine>/actions`
+
+Contient les mutations déclenchées par les formulaires.
+
+Autorisé :
+
+- Lire et valider `FormData`.
+- Distinguer les mutations via `intent`.
+- Vérifier session/rôle.
+- Appeler `app/server/api`.
+- Retourner `redirect`, `data({ ok: true })` ou une erreur métier propre.
+
+Interdit :
+
+- Mettre de la logique d'affichage.
+- Retourner des secrets ou tokens.
+- Accepter un rôle, un userId ou un ownerId venant du formulaire comme source de vérité.
+
+## Pattern de page recommandé
+
+```ts
+// app/pages/tickets/TicketsListPage.tsx
+import type { LoaderFunctionArgs } from 'react-router';
+import { useLoaderData, Form } from 'react-router';
+import { ticketsListLoader } from '~/server/tickets/loaders/ticket.server';
+
+export async function loader(args: LoaderFunctionArgs) {
+  return ticketsListLoader(args);
+}
+
+export default function TicketsListPage() {
+  const { tickets } = useLoaderData<typeof loader>();
+  return <div>{/* UI */}</div>;
+}
+```
+
+```ts
+// app/pages/tickets/TicketDetailPage.tsx
+import type { LoaderFunctionArgs, ActionFunctionArgs } from 'react-router';
+import { useFetcher, useLoaderData } from 'react-router';
+import { ticketDetailLoader } from '~/server/tickets/loaders/ticket.server';
+import { ticketDetailAction } from '~/server/tickets/actions/ticket.server';
+
+export async function loader(args: LoaderFunctionArgs) {
+  return ticketDetailLoader(args);
+}
+
+export async function action(args: ActionFunctionArgs) {
+  return ticketDetailAction(args);
+}
+
+export default function TicketDetailPage() {
+  const { ticket } = useLoaderData<typeof loader>();
+  const fetcher = useFetcher();
+  return <div>{/* UI */}</div>;
+}
+```
+
+## Migration d'un fichier existant trop chargé
+
+Quand une page contient déjà un loader/action complet :
+
+1. Créer le dossier `app/server/<domaine>/loaders/` ou `actions/`.
+2. Déplacer la logique serveur dans `<nom>.server.ts`.
+3. Laisser dans la page uniquement l'export qui délègue.
+4. Garder les types exportés utiles à l'UI depuis le fichier server si nécessaire.
+5. Vérifier que la page n'importe aucun secret, session ou API brute.
+6. Lancer typecheck/tests.
+
+## Priorité pour le test MSK
+
+Pour être crédible en profil Lead, privilégier une architecture lisible et justifiable :
+
+- Un reviewer doit comprendre rapidement où se trouve la logique d'une page.
+- Une feature doit pouvoir être confiée à un autre développeur sans mélange UI/API/session.
+- Les erreurs métier importantes (`403`, `409`, `422`) doivent remonter proprement jusqu'à l'UI.

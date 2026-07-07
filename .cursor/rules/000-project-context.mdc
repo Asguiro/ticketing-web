@@ -1,0 +1,64 @@
+---
+description: Contexte projet, périmètre fonctionnel, SSR et règles UI par rôle - à toujours garder en tête (repo frontend)
+globs:
+alwaysApply: true
+---
+
+# Contexte du projet - repo frontend web
+
+Ce repo contient uniquement le frontend de la plateforme de gestion de tickets de support
+(test technique Lead Full Stack - MSK Création). L'API vit dans un **repo séparé**
+(`ticketing-api`), déployée séparément, et reste la source de vérité métier.
+
+Le frontend doit être construit avec **React Router v7 en framework mode avec SSR activé**.
+Ne pas transformer le projet en SPA (`ssr: false`) sauf décision explicite documentée et
+validée par le lead.
+
+## Principe d'architecture attendu
+
+Le frontend est séparé en trois couches nettes :
+
+1. **Pages / UI** : composants React, affichage, formulaires, états visuels.
+2. **Routes React Router** : déclaration du routing, export `loader`/`action`, wiring minimal.
+3. **Server frontend SSR** : tout ce qui lit une session, appelle l'API, valide un `FormData`,
+   redirige, rafraîchit un token ou traite une mutation.
+
+Aucune page React ne doit contenir directement une logique serveur lourde. Les pages doivent
+importer leurs loaders/actions depuis `app/server/**`.
+
+## Stack de ce repo
+
+- React Router v7 en framework mode avec SSR.
+- `app/routes.ts` explicite avec `layout`, `prefix`, `index`, `route` depuis `@react-router/dev/routes`.
+- Session côté frontend via cookie `httpOnly` pour protéger les routes SSR.
+- Appels à l'API externe depuis les `loader`/`action` serveur, pas directement depuis les composants.
+- Déploiement : Vercel ou équivalent compatible SSR React Router.
+
+## Rôles et permissions UI
+
+- **client** : crée des tickets, ne voit et ne suit que les siens.
+- **agent** : traite les tickets qui lui sont assignés, échange avec le client, fait évoluer le statut.
+- **admin** : supervise tout, assigne les tickets, gère les utilisateurs.
+
+Le frontend adapte l'affichage selon le rôle courant, mais ne considère jamais cet affichage
+comme une sécurité. La sécurité réelle est côté API. Si l'API refuse une action (`403`, `409`,
+transition invalide, conflit d'assignation), l'UI affiche un message clair et revalide les données.
+
+## Vues attendues
+
+- Authentification.
+- Dashboard avec indicateurs chiffrés : tickets ouverts, tickets en retard, tickets résolus.
+- Liste des tickets avec filtres, tri et pagination.
+- Vue détail ticket : fil de discussion, historique, actions possibles selon le rôle.
+- Création de ticket côté client.
+- Assignation et changement de statut côté agent/admin.
+- Gestion utilisateurs côté admin si le périmètre temps le permet.
+
+## Ce que l'IA doit toujours faire dans ce repo
+
+- Respecter l'architecture SSR séparée : UI dans `app/pages` ou `app/components`, logique serveur dans `app/server`.
+- Ne jamais mettre de secret, token API ou logique d'auth dans un composant client.
+- Ne jamais appeler l'API externe avec un `fetch` brut depuis un composant React.
+- Ne jamais dupliquer la logique métier de l'API : SLA, transitions de statut, droits définitifs.
+- Retourner des erreurs propres depuis les actions/loaders et prévoir l'affichage côté UI.
+- Préférer un périmètre réduit, propre, typé et justifiable plutôt qu'un périmètre large mais fragile.
