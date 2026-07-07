@@ -115,7 +115,7 @@ Voir le README du repo `ticketing-api`.
 
 | Service | URL |
 |---------|-----|
-| Frontend (Vercel) | _à compléter après déploiement_ |
+| Frontend (Vercel) | https://ticketing-web-pi.vercel.app |
 | API (Render) | https://ticketing-api-7mcd.onrender.com |
 | Swagger API | https://ticketing-api-7mcd.onrender.com/api/docs |
 
@@ -202,30 +202,19 @@ Tester en **navigation privée** :
 - [ ] Déconnexion et redirection vers login
 - [ ] Aucune bannière « mode mock » (`MOCK_API` doit être `false`)
 
-### Étape 7 — (Optionnel) Preset Vercel
+### Erreur 500 `FUNCTION_INVOCATION_FAILED`
 
-Vercel recommande le package `@vercel/react-router` pour optimiser le déploiement SSR
-(bundle splitting, résumé de déploiement).
+Cause la plus fréquente : **`SESSION_SECRET` manquant** sur Vercel. Sans cette variable,
+le serveur SSR plante au démarrage avec `SESSION_SECRET must be set in production`.
 
-```bash
-npm install @vercel/react-router
-```
+1. **Settings** → **Environment Variables**
+2. Vérifier que `SESSION_SECRET`, `API_URL` et `MOCK_API=false` sont bien définis
+3. **Deployments** → **…** → **Redeploy** (obligatoire après ajout d'une variable)
 
-Puis dans `react-router.config.ts` :
+### Étape 7 — Preset Vercel (obligatoire)
 
-```ts
-import { vercelPreset } from "@vercel/react-router/vite";
-import type { Config } from "@react-router/dev/config";
-
-export default {
-  ssr: true,
-  presets: [vercelPreset()],
-} satisfies Config;
-```
-
-> **Note :** au moment de l'écriture, `@vercel/react-router` déclare des peer dependencies
-> React Router v7. Le projet utilise React Router v8. Le déploiement fonctionne sans ce preset
-> (zero-config Vercel). Ajouter le preset quand le package supportera officiellement v8.
+Le projet utilise `@vercel/react-router` avec `vercelPreset()` dans `react-router.config.ts`.
+Sans ce preset, Vercel affiche un avertissement au build et la fonction serverless peut crasher.
 
 ### Redéploiements suivants
 
