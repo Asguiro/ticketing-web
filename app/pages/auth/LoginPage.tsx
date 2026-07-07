@@ -1,8 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { Form, useActionData, useLoaderData, useNavigation } from "react-router";
-import { Ticket } from "lucide-react";
 
-import { StatsCard } from "~/components/dashboard/StatsCard";
 import { Input } from "~/components/ui/Input";
 import { AppRouteErrorBoundary } from "~/components/shared/AppRouteErrorBoundary";
 import { Button } from "~/components/ui/Button";
@@ -29,45 +27,31 @@ export default function LoginPage() {
     (actionData && "error" in actionData ? actionData.error : null) ?? error;
 
   return (
-    <div
-      className="flex min-h-screen items-center justify-center bg-base-200"
-      style={{ padding: "var(--msk-space-4)" }}
-    >
-      <div className="grid w-full max-w-5xl gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <section
-          className="glass-panel hidden flex-col justify-between lg:flex"
-          style={{ padding: "var(--msk-space-8)" }}
-        >
-          <div>
-            <p className="text-col-header text-primary">MSK CREATION</p>
-            <h1 className="mt-4 text-page-title">
-              Plateforme de support
-              <span className="block text-primary">tickets & SLA</span>
-            </h1>
-            <p className="mt-4 max-w-md text-page-desc">
-              Gestion de tickets client, agent et administrateur — suivi SLA,
-              assignation et messagerie intégrée.
-            </p>
-          </div>
-          <StatsCard
-            label="Tickets ouverts (démo)"
-            value={12}
-            icon={Ticket}
-            description="exemple de carte stat"
-          />
+    <div className="flex min-h-screen items-center justify-center bg-base-200 p-4 sm:p-6">
+      <div className="grid w-full max-w-5xl gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8">
+        <section className="glass-panel hidden flex-col justify-center p-8 lg:flex lg:p-10">
+          <p className="text-col-header text-primary">MSK CREATION</p>
+          <h1 className="mt-4 text-page-title">
+            Plateforme de support
+            <span className="mt-1 block text-primary">client & équipe</span>
+          </h1>
+          <p className="mt-4 max-w-md text-page-desc">
+            Suivi des demandes, assignation des agents et messagerie intégrée —
+            un espace unique pour clients, agents et administrateurs.
+          </p>
         </section>
 
-        <section className="panel-section">
-          <div className="panel-section-header">
+        <section className="glass-panel flex flex-col p-6 sm:p-8">
+          <header className="border-b border-base-300/60 pb-6">
             <h2 className="text-page-title">Connexion</h2>
-            <p className="mt-1 text-page-desc">
-              Accédez à votre espace client, agent ou administrateur.
+            <p className="mt-2 text-page-desc">
+              Accédez à votre espace selon votre rôle.
             </p>
-          </div>
+          </header>
 
-          <div className="panel-section-body">
+          <div className="flex flex-1 flex-col pt-6">
             {isMockMode ? (
-              <div className="alert alert-info">
+              <div className="alert alert-info mb-6">
                 <div className="text-sm">
                   <p className="font-medium">Mode démo actif</p>
                   <ul className="mt-2 space-y-1">
@@ -83,10 +67,10 @@ export default function LoginPage() {
             ) : null}
 
             {errorMessage ? (
-              <div className="alert alert-error mt-4">{errorMessage}</div>
+              <div className="alert alert-error mb-6">{errorMessage}</div>
             ) : null}
 
-            <Form method="post" className="mt-6 space-y-4">
+            <Form method="post" className="flex flex-col gap-5">
               <Input
                 name="email"
                 type="email"
@@ -103,13 +87,16 @@ export default function LoginPage() {
                 defaultValue={isMockMode ? "ChangeMe123!" : undefined}
                 required
               />
-              <Button
-                type="submit"
-                className={`btn-block ${isSubmitting ? "loading" : ""}`}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Connexion..." : "Se connecter"}
-              </Button>
+              <div className="pt-4">
+                <Button
+                  type="submit"
+                  size="lg"
+                  className={`btn-block ${isSubmitting ? "loading" : ""}`}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Connexion..." : "Se connecter"}
+                </Button>
+              </div>
             </Form>
           </div>
         </section>

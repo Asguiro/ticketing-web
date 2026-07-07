@@ -1,13 +1,13 @@
 import type { LoaderFunctionArgs } from "react-router";
-import { Link, useLoaderData } from "react-router";
-import { AlertCircle, CheckCircle2, Plus, Ticket } from "lucide-react";
+import { useLoaderData } from "react-router";
+import { AlertCircle, CheckCircle2, Ticket } from "lucide-react";
 
 import { StatsCard } from "~/components/dashboard/StatsCard";
 import { AppRouteErrorBoundary } from "~/components/shared/AppRouteErrorBoundary";
 import { PageHeader } from "~/components/shared/PageHeader";
 import { PageLoadingSkeleton } from "~/components/shared/PageLoadingSkeleton";
 import { PanelSection } from "~/components/shared/PanelSection";
-import { isAdmin, isAgent, isClient } from "~/lib/roles";
+import { isAdmin, isAgent } from "~/lib/roles";
 import { dashboardLoader } from "~/server/dashboard/loaders/dashboard.server";
 
 export async function loader(args: LoaderFunctionArgs) {
@@ -22,14 +22,6 @@ export default function DashboardPage() {
       <PageHeader
         title="Business Dashboard"
         description="Vue d'ensemble de l'activité selon votre rôle."
-        actions={
-          isClient(user.role) ? (
-            <Link to="/tickets/new" className="btn btn-primary gap-2">
-              <Plus className="size-4" />
-              Créer un ticket
-            </Link>
-          ) : undefined
-        }
       />
 
       <div className="grid gap-4 md:grid-cols-3">

@@ -23,7 +23,7 @@ export function GlobalLoadingBar() {
 
   return (
     <div
-      className="fixed inset-x-0 top-0 z-[100] h-1 overflow-hidden bg-primary/10"
+      className="fixed inset-x-0 top-0 z-100 h-1 overflow-hidden bg-primary/10"
       role="progressbar"
       aria-label="Chargement en cours"
     >

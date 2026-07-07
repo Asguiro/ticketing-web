@@ -1,13 +1,13 @@
 import type { LoaderFunctionArgs } from "react-router";
-import { useLoaderData } from "react-router";
-import { AlertCircle, CheckCircle2, Ticket, UserX } from "lucide-react";
+import { Link, useLoaderData } from "react-router";
+import { AlertCircle, CheckCircle2, Plus, Ticket, UserX } from "lucide-react";
 
 import { PageHeader } from "~/components/shared/PageHeader";
 import { AppRouteErrorBoundary } from "~/components/shared/AppRouteErrorBoundary";
 import { PageLoadingSkeleton } from "~/components/shared/PageLoadingSkeleton";
 import { TicketFilters } from "~/components/tickets/TicketFilters";
 import { TicketTable } from "~/components/tickets/TicketTable";
-import { isAdmin } from "~/lib/roles";
+import { isAdmin, isClient } from "~/lib/roles";
 import { ticketsListLoader } from "~/server/tickets/loaders/ticket.server";
 import type { TicketStatus } from "~/types/ticket";
 
@@ -37,6 +37,17 @@ export default function TicketsListPage() {
           adminView
             ? "Vue globale de tous les tickets : statut, agent assigné et résolution."
             : "Liste des tickets avec filtres et tri."
+        }
+        actions={
+          isClient(user.role) ? (
+            <Link
+              to="/tickets/new"
+              className="btn btn-primary btn-circle"
+              aria-label="Nouveau ticket"
+            >
+              <Plus className="size-5" />
+            </Link>
+          ) : undefined
         }
       />
 

@@ -1,14 +1,8 @@
-import {
-  LayoutDashboard,
-  LogOut,
-  Plus,
-  Ticket,
-  Users,
-} from "lucide-react";
+import { LayoutDashboard, LogOut, Ticket, Users } from "lucide-react";
 import { Form, NavLink, useLocation } from "react-router";
 
 import { PersonAvatar } from "~/components/shared/PersonAvatar";
-import { isAdmin, isClient, ROLE_LABELS } from "~/lib/roles";
+import { isAdmin, ROLE_LABELS } from "~/lib/roles";
 import type { SessionUser } from "~/types/user";
 
 type AppSidebarProps = {
@@ -60,12 +54,6 @@ export function AppSidebar({ user }: AppSidebarProps) {
           <Ticket className="size-4 shrink-0" />
           Tickets
         </NavLink>
-        {isClient(user.role) ? (
-          <NavLink to="/tickets/new" className={navLinkClass}>
-            <Plus className="size-4 shrink-0" />
-            Nouveau ticket
-          </NavLink>
-        ) : null}
         {isAdmin(user.role) ? (
           <NavLink
             to="/users"
