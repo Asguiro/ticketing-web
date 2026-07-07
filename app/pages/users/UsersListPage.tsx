@@ -1,4 +1,4 @@
-import type { LoaderFunctionArgs } from "react-router";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { Link, useLoaderData } from "react-router";
 import { Plus, Shield, UserCog, Users } from "lucide-react";
 
@@ -8,6 +8,7 @@ import { PageLoadingSkeleton } from "~/components/shared/PageLoadingSkeleton";
 import { UserFilters } from "~/components/users/UserFilters";
 import { UserTable } from "~/components/users/UserTable";
 import { ROLE_LABELS } from "~/lib/roles";
+import { usersListAction } from "~/server/users/actions/user.server";
 import { usersListLoader } from "~/server/users/loaders/user.server";
 import type { Role, User } from "~/types/user";
 
@@ -15,12 +16,16 @@ export async function loader(args: LoaderFunctionArgs) {
   return usersListLoader(args);
 }
 
+export async function action(args: ActionFunctionArgs) {
+  return usersListAction(args);
+}
+
 function countByRole(users: User[], role: Role): number {
   return users.filter((user) => user.role === role).length;
 }
 
 export default function UsersListPage() {
-  const { users, filters, pagination } = useLoaderData<typeof loader>();
+  const { user, users, filters, pagination } = useLoaderData<typeof loader>();
 
   const roleCounts = {
     client: countByRole(users, "CLIENT"),
@@ -79,6 +84,7 @@ export default function UsersListPage() {
       <UserTable
         users={users}
         pagination={pagination}
+        currentUserId={user.id}
         toolbar={<UserFilters filters={filters} embedded />}
       />
     </div>

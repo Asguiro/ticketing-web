@@ -4,6 +4,7 @@ import { Mail } from "lucide-react";
 import { ListingPanel } from "~/components/shared/ListingTableShell";
 import { Pagination } from "~/components/shared/Pagination";
 import { PersonCell } from "~/components/shared/PersonCell";
+import { UserRowActions } from "~/components/users/UserRowActions";
 import { RoleBadge } from "~/components/users/RoleBadge";
 import { formatDateShort } from "~/lib/date-format";
 import type { PaginatedResult } from "~/types/api";
@@ -12,10 +13,11 @@ import type { User } from "~/types/user";
 type UserTableProps = {
   users: User[];
   pagination: PaginatedResult<User>["pagination"];
+  currentUserId: string;
   toolbar?: ReactNode;
 };
 
-export function UserTable({ users, pagination, toolbar }: UserTableProps) {
+export function UserTable({ users, pagination, currentUserId, toolbar }: UserTableProps) {
   if (users.length === 0) {
     return (
       <ListingPanel
@@ -57,15 +59,17 @@ export function UserTable({ users, pagination, toolbar }: UserTableProps) {
 
       <table className="listing-table">
         <colgroup>
-          <col style={{ width: "52%" }} />
+          <col style={{ width: "42%" }} />
+          <col style={{ width: "18%" }} />
           <col style={{ width: "22%" }} />
-          <col style={{ width: "26%" }} />
+          <col style={{ width: "18%" }} />
         </colgroup>
         <thead>
           <tr>
             <th className="text-col-header">Utilisateur</th>
             <th className="text-col-header">Rôle</th>
             <th className="text-col-header">Créé le</th>
+            <th className="text-col-header text-right">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -85,6 +89,9 @@ export function UserTable({ users, pagination, toolbar }: UserTableProps) {
                     {user.createdAt ? formatDateShort(user.createdAt) : "—"}
                   </span>
                 </div>
+              </td>
+              <td>
+                <UserRowActions user={user} currentUserId={currentUserId} />
               </td>
             </tr>
           ))}

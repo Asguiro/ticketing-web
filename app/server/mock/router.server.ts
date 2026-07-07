@@ -452,6 +452,62 @@ export async function mockApiRequest<T>(
     return target as T;
   }
 
+  if (userDetail && method === "PATCH") {
+    const user = requireMockUser(accessToken);
+    if (user.role !== "ADMIN") {
+      throw new ApiError(403, { message: "Réservé aux administrateurs." });
+    }
+
+    const target = store.users.find((entry) => entry.id === userDetail.id);
+    if (!target) {
+      throw new ApiError(404, { message: "Utilisateur introuvable." });
+    }
+
+    const payload = body as {
+      email?: string;
+      password?: string;
+      role?: User["role"];
+    };
+
+    if (payload.email) {
+      const emailTaken = store.users.some(
+        (entry) => entry.id !== target.id && entry.email === payload.email,
+      );
+      if (emailTaken) {
+        throw new ApiError(409, { message: "Cet email est déjà utilisé." });
+      }
+      target.email = payload.email;
+    }
+
+    if (payload.role) {
+      target.role = payload.role;
+    }
+
+    target.updatedAt = new Date().toISOString();
+    return target as T;
+  }
+
+  if (userDetail && method === "DELETE") {
+    const user = requireMockUser(accessToken);
+    if (user.role !== "ADMIN") {
+      throw new ApiError(403, { message: "Réservé aux administrateurs." });
+    }
+
+    if (user.id === userDetail.id) {
+      throw new ApiError(400, {
+        message: "Vous ne pouvez pas supprimer votre propre compte.",
+      });
+    }
+
+    const index = store.users.findIndex((entry) => entry.id === userDetail.id);
+    if (index === -1) {
+      throw new ApiError(404, { message: "Utilisateur introuvable." });
+    }
+
+    store.users.splice(index, 1);
+    return undefined as T;
+  }
+
   throw new ApiError(404, {
     message: `Endpoint mock non implémenté: ${method} ${path}`,
   });
