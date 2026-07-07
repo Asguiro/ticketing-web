@@ -1,3 +1,5 @@
+import { Badge } from "~/components/ui/Badge";
+
 export function OverdueBadge() {
-  return <span className="badge badge-warning badge-soft">En retard</span>;
+  return <Badge variant="error">En retard</Badge>;
 }

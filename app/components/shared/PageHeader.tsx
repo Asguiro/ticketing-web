@@ -8,12 +8,13 @@ type PageHeaderProps = {
 
 export function PageHeader({ title, description, actions }: PageHeaderProps) {
   return (
-    <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <div
+      className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
+      style={{ marginBottom: "var(--msk-space-6)" }}
+    >
       <div>
-        <h1 className="text-3xl font-bold text-base-content">{title}</h1>
-        {description ? (
-          <p className="mt-2 text-sm text-base-content/60">{description}</p>
-        ) : null}
+        <h1 className="text-page-title text-base-content">{title}</h1>
+        {description ? <p className="mt-1 text-page-desc">{description}</p> : null}
       </div>
       <div className="flex items-center gap-2">
         <button type="button" className="btn btn-ghost btn-square">

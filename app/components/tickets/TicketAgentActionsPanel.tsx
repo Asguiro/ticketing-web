@@ -1,5 +1,6 @@
 import { Headphones } from "lucide-react";
 
+import { PanelSection } from "~/components/shared/PanelSection";
 import { StatusTransitionButtons } from "~/components/tickets/StatusTransitionButtons";
 import { TicketSelfAssignButton } from "~/components/tickets/TicketSelfAssignButton";
 import { TicketStatusWorkflow } from "~/components/tickets/TicketStatusWorkflow";
@@ -34,31 +35,24 @@ export function TicketAgentActionsPanel({
   }
 
   return (
-    <section className="overflow-hidden rounded-box border border-base-300/60 bg-base-100 shadow-md">
-      <div className="border-b border-base-300/60 bg-linear-to-r from-primary/6 via-transparent to-transparent px-5 py-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="flex size-9 items-center justify-center rounded-xl bg-primary/12 text-primary">
-              <Headphones className="size-4.5" />
-            </div>
-            <div>
-              <h2 className="text-base font-semibold text-base-content">
-                Actions agent
-              </h2>
-              <p className="text-xs text-base-content/55">
-                Suivez l&apos;avancement et faites évoluer le ticket
-              </p>
-            </div>
-          </div>
-          <StatusBadge status={currentStatus} />
+    <PanelSection
+      title="Actions agent"
+      description="Suivez l'avancement et faites évoluer le ticket"
+      actions={<StatusBadge status={currentStatus} variant="pill" />}
+      headerClassName="bg-linear-to-r from-primary/6 via-transparent to-transparent"
+    >
+      <div className="mb-4 flex items-center gap-3">
+        <div className="flex size-9 items-center justify-center rounded-xl bg-primary/12 text-primary">
+          <Headphones className="size-4.5" />
         </div>
+        <p className="text-page-desc">
+          Utilisez le workflow ci-dessous pour faire progresser le ticket.
+        </p>
       </div>
 
-      <div className="space-y-6 p-5">
+      <div className="space-y-6">
         <TicketStatusWorkflow currentStatus={currentStatus} />
-
         {showSelfAssign ? <TicketSelfAssignButton /> : null}
-
         {showTransitions ? (
           <StatusTransitionButtons
             currentStatus={currentStatus}
@@ -67,6 +61,6 @@ export function TicketAgentActionsPanel({
           />
         ) : null}
       </div>
-    </section>
+    </PanelSection>
   );
 }

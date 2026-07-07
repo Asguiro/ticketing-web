@@ -4,11 +4,17 @@ export function formatDateShort(value: string | null | undefined): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
 
-  return date.toLocaleDateString("fr-FR", {
+  const parts = new Intl.DateTimeFormat("fr-FR", {
     day: "2-digit",
     month: "short",
     year: "numeric",
-  });
+  }).formatToParts(date);
+
+  return parts
+    .filter((part) => part.type !== "literal" || part.value.trim() !== "")
+    .map((part) => part.value.trim())
+    .filter(Boolean)
+    .join(" ");
 }
 
 export function formatDateTime(value: string | null | undefined): string {

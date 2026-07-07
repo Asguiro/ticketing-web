@@ -21,7 +21,7 @@ export default function NewUserPage() {
   const actionData = useActionData<typeof action>();
 
   return (
-    <div>
+    <div className="page-stack">
       <PageHeader
         title="Nouvel utilisateur"
         description="Créez un compte client, agent ou administrateur en quelques étapes."

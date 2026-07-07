@@ -1,6 +1,9 @@
+import type { ReactNode } from "react";
 import { Mail } from "lucide-react";
 
+import { ListingPanel } from "~/components/shared/ListingTableShell";
 import { Pagination } from "~/components/shared/Pagination";
+import { PersonCell } from "~/components/shared/PersonCell";
 import { RoleBadge } from "~/components/users/RoleBadge";
 import { formatDateShort } from "~/lib/date-format";
 import type { PaginatedResult } from "~/types/api";
@@ -9,77 +12,84 @@ import type { User } from "~/types/user";
 type UserTableProps = {
   users: User[];
   pagination: PaginatedResult<User>["pagination"];
+  toolbar?: ReactNode;
 };
 
-function getInitials(email: string): string {
-  const localPart = email.split("@")[0] ?? email;
-  const parts = localPart.split(/[._-]/).filter(Boolean);
-  if (parts.length >= 2) {
-    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-  }
-  return localPart.slice(0, 2).toUpperCase();
-}
-
-export function UserTable({ users, pagination }: UserTableProps) {
+export function UserTable({ users, pagination, toolbar }: UserTableProps) {
   if (users.length === 0) {
     return (
-      <div className="card bg-base-100 shadow-md">
-        <div className="card-body items-center text-center text-sm text-base-content/60">
-          Aucun utilisateur trouvé.
-        </div>
-      </div>
+      <ListingPanel
+        toolbar={toolbar}
+        isEmpty
+        emptyIcon={
+          <div className="rounded-full bg-base-200/80 p-4">
+            <Mail className="size-7 text-base-content/25" />
+          </div>
+        }
+        emptyTitle="Aucun utilisateur trouvé"
+        emptyDescription="Aucun compte ne correspond à vos critères de recherche."
+      />
     );
   }
 
   return (
-    <div className="card bg-base-100 shadow-md">
-      <div className="overflow-x-auto">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Utilisateur</th>
-              <th>Rôle</th>
-              <th>Créé le</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user.id} className="hover">
-                <td>
-                  <div className="flex items-center gap-3">
-                    <div className="avatar placeholder">
-                      <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
-                        {getInitials(user.email)}
-                      </div>
-                    </div>
-                    <div className="min-w-0">
-                      <p className="flex items-center gap-1.5 font-medium">
-                        <Mail className="size-3.5 shrink-0 text-base-content/40" />
-                        <span className="truncate">{user.email}</span>
-                      </p>
-                      <p className="text-xs text-base-content/50">{user.id}</p>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <RoleBadge role={user.role} />
-                </td>
-                <td className="text-base-content/70">
-                  {formatDateShort(user.createdAt)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="card-body border-t border-base-300/60 pt-0">
+    <ListingPanel
+      toolbar={toolbar}
+      footer={
         <Pagination
           page={pagination.page}
           totalPages={pagination.totalPages}
           total={pagination.total}
           itemLabel="utilisateurs"
+          embedded
         />
+      }
+    >
+      <div
+        className="w-full border-b border-base-300/40"
+        style={{ padding: "0.625rem var(--msk-space-4)" }}
+      >
+        <p className="text-sm text-base-content/55">
+          <span className="font-medium text-base-content">{pagination.total}</span>{" "}
+          utilisateur{pagination.total > 1 ? "s" : ""}
+        </p>
       </div>
-    </div>
+
+      <table className="listing-table">
+        <colgroup>
+          <col style={{ width: "52%" }} />
+          <col style={{ width: "22%" }} />
+          <col style={{ width: "26%" }} />
+        </colgroup>
+        <thead>
+          <tr>
+            <th className="text-col-header">Utilisateur</th>
+            <th className="text-col-header">Rôle</th>
+            <th className="text-col-header">Créé le</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map((user) => (
+            <tr key={user.id}>
+              <td>
+                <PersonCell email={user.email} />
+              </td>
+              <td>
+                <div className="cell-content">
+                  <RoleBadge role={user.role} variant="pill" />
+                </div>
+              </td>
+              <td>
+                <div className="cell-content">
+                  <span className="cell-date">
+                    {user.createdAt ? formatDateShort(user.createdAt) : "—"}
+                  </span>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </ListingPanel>
   );
 }

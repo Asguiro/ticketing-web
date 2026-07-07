@@ -311,15 +311,13 @@ export function NewTicketWizard({
         })}
       </ol>
 
-      <div className="glass-panel overflow-hidden">
-        <div className="border-b border-base-300/60 bg-base-200/40 px-6 py-5 sm:px-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+      <div className="panel-section overflow-hidden">
+        <div className="panel-section-header bg-base-200/40">
+          <p className="text-col-header text-primary">
             Étape {step} sur {STEPS.length}
           </p>
-          <h2 className="mt-1 text-xl font-bold">{activeStep.title}</h2>
-          <p className="mt-1 text-sm text-base-content/60">
-            {activeStep.description}
-          </p>
+          <h2 className="mt-1 text-page-title">{activeStep.title}</h2>
+          <p className="mt-1 text-page-desc">{activeStep.description}</p>
         </div>
 
         {displayedGlobalError ? (

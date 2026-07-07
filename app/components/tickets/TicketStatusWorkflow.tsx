@@ -1,3 +1,4 @@
+import { Badge } from "~/components/ui/Badge";
 import { STATUS_LABELS } from "~/lib/ticket-labels";
 import {
   getWorkflowStepState,
@@ -16,12 +17,8 @@ export function TicketStatusWorkflow({ currentStatus }: TicketStatusWorkflowProp
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-xs font-medium uppercase tracking-wide text-base-content/50">
-          Progression
-        </p>
-        {isReopened ? (
-          <span className="badge badge-accent badge-sm">Réouvert</span>
-        ) : null}
+        <p className="text-col-header">Progression</p>
+        {isReopened ? <Badge variant="accent">Réouvert</Badge> : null}
       </div>
 
       <div className="relative flex items-start justify-between gap-1">

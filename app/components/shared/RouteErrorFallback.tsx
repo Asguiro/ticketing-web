@@ -22,8 +22,11 @@ export function RouteErrorFallback({
   const isOffline = status === 503 || title.toLowerCase().includes("hors ligne");
 
   return (
-    <div className="flex min-h-[60vh] items-center justify-center px-4 py-12">
-      <div className="glass-panel w-full max-w-lg p-8 text-center">
+    <div
+      className="flex min-h-[60vh] items-center justify-center"
+      style={{ padding: "var(--msk-space-8) var(--msk-space-4)" }}
+    >
+      <div className="glass-panel w-full max-w-lg text-center" style={{ padding: "var(--msk-space-8)" }}>
         <div
           className={`mx-auto mb-4 flex size-16 items-center justify-center rounded-full ${
             isOffline
@@ -33,22 +36,20 @@ export function RouteErrorFallback({
                 : "bg-base-300 text-base-content/60"
           }`}
         >
-          <span className="text-2xl font-bold">{title}</span>
+          <span className="text-stat-value">{status ?? "!"}</span>
         </div>
 
-        <h1 className="text-xl font-semibold text-base-content">
+        <h1 className="text-page-title text-base-content">
           {status === 403
             ? "Accès refusé"
             : status === 404
               ? "Page introuvable"
               : isOffline
                 ? "Service indisponible"
-                : "Une erreur est survenue"}
+                : title}
         </h1>
 
-        <p className="mt-3 text-sm leading-relaxed text-base-content/70">
-          {message}
-        </p>
+        <p className="mt-3 text-page-desc">{message}</p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           {showRetry ? (

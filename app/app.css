@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./styles/tokens.css";
 @plugin "daisyui";
 @plugin "daisyui/theme" {
   name: "msk";
@@ -51,16 +52,148 @@
 
 html,
 body {
-  @apply min-h-full bg-base-200 text-base-content;
+  min-height: 100%;
+  background-color: var(--msk-bg);
+  color: var(--msk-text);
 }
 
-.stat-gradient-card {
-  background: linear-gradient(135deg, oklch(62% 0.2 275), oklch(58% 0.16 250));
-  color: white;
+/* ── Layout helpers ── */
+
+.page-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--msk-space-6);
+  width: 100%;
 }
 
 .glass-panel {
-  @apply rounded-box border border-base-300/60 bg-base-100/90 shadow-lg backdrop-blur-sm;
+  border-radius: var(--radius-box);
+  border: 1px solid color-mix(in oklch, var(--color-base-300) 60%, transparent);
+  background-color: color-mix(in oklch, var(--color-base-100) 90%, transparent);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.08);
+  backdrop-filter: blur(4px);
+}
+
+/* ── Panel sections (detail pages, wizards, chat) ── */
+
+.panel-section {
+  overflow: hidden;
+  border-radius: var(--radius-box);
+  border: 1px solid color-mix(in oklch, var(--color-base-300) 60%, transparent);
+  background-color: var(--msk-surface);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.06);
+}
+
+.panel-section-header {
+  border-bottom: 1px solid color-mix(in oklch, var(--color-base-300) 60%, transparent);
+  padding: var(--msk-space-4) var(--msk-space-4);
+}
+
+.panel-section-body {
+  padding: var(--msk-space-4);
+}
+
+.panel-section-title {
+  font-size: var(--msk-text-cell-primary-size);
+  font-weight: 600;
+  line-height: var(--msk-text-cell-primary-leading);
+  color: var(--msk-text);
+}
+
+.panel-section-desc {
+  margin-top: 0.125rem;
+  font-size: var(--msk-text-cell-secondary-size);
+  line-height: var(--msk-text-cell-secondary-leading);
+  color: var(--msk-text-secondary);
+}
+
+/* ── Stat cards ── */
+
+.stat-card {
+  border-radius: var(--radius-box);
+  background-color: var(--msk-surface);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.06);
+  padding: var(--msk-space-4);
+}
+
+.stat-card .stat-figure {
+  opacity: 0.85;
+}
+
+.stat-card-desc {
+  margin-top: 0.25rem;
+  font-size: var(--msk-text-cell-secondary-size);
+  color: var(--msk-text-secondary);
+}
+
+/* ── Listing / DataTable ── */
+
+.listing-table {
+  width: 100%;
+  min-width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.listing-table thead tr {
+  background-color: color-mix(in oklch, var(--color-base-200) 50%, transparent);
+}
+
+.listing-table thead th {
+  height: 3rem;
+  border-bottom: 1px solid color-mix(in oklch, var(--color-base-300) 60%, transparent);
+  padding: 0 var(--msk-space-4);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.listing-table tbody td {
+  height: var(--msk-table-row-height);
+  border-bottom: 1px solid color-mix(in oklch, var(--color-base-300) 30%, transparent);
+  padding: 0 var(--msk-space-4);
+  vertical-align: middle;
+}
+
+.listing-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.listing-table tbody tr[data-clickable="true"] {
+  cursor: pointer;
+  transition: background-color 150ms;
+}
+
+.listing-table tbody tr[data-clickable="true"]:hover {
+  background-color: color-mix(in oklch, var(--color-base-200) 65%, transparent);
+}
+
+.listing-table tbody tr[data-clickable="true"]:focus-visible {
+  background-color: color-mix(in oklch, var(--color-base-200) 65%, transparent);
+  outline: none;
+  box-shadow: inset 0 0 0 2px color-mix(in oklch, var(--color-primary) 20%, transparent);
+}
+
+.listing-table .cell-content {
+  display: flex;
+  min-height: 2.5rem;
+  width: 100%;
+  align-items: center;
+}
+
+.listing-table .cell-content-start {
+  display: flex;
+  min-height: 2.5rem;
+  width: 100%;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.125rem;
+}
+
+.listing-table .cell-person {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--msk-space-3);
 }
 
 @keyframes loading-bar {

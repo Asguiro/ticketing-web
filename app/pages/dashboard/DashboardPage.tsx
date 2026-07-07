@@ -1,11 +1,12 @@
 import type { LoaderFunctionArgs } from "react-router";
 import { Link, useLoaderData } from "react-router";
-import { Plus } from "lucide-react";
+import { AlertCircle, CheckCircle2, Plus, Ticket } from "lucide-react";
 
 import { StatsCard } from "~/components/dashboard/StatsCard";
 import { AppRouteErrorBoundary } from "~/components/shared/AppRouteErrorBoundary";
 import { PageHeader } from "~/components/shared/PageHeader";
 import { PageLoadingSkeleton } from "~/components/shared/PageLoadingSkeleton";
+import { PanelSection } from "~/components/shared/PanelSection";
 import { isAdmin, isAgent, isClient } from "~/lib/roles";
 import { dashboardLoader } from "~/server/dashboard/loaders/dashboard.server";
 
@@ -17,13 +18,13 @@ export default function DashboardPage() {
   const { user, stats } = useLoaderData<typeof loader>();
 
   return (
-    <div>
+    <div className="page-stack">
       <PageHeader
         title="Business Dashboard"
         description="Vue d'ensemble de l'activité selon votre rôle."
         actions={
           isClient(user.role) ? (
-            <Link to="/tickets/new" className="btn btn-primary">
+            <Link to="/tickets/new" className="btn btn-primary gap-2">
               <Plus className="size-4" />
               Créer un ticket
             </Link>
@@ -32,43 +33,44 @@ export default function DashboardPage() {
       />
 
       <div className="grid gap-4 md:grid-cols-3">
-        <StatsCard label="Tickets ouverts" value={stats.openCount} />
+        <StatsCard
+          label="Tickets ouverts"
+          value={stats.openCount}
+          icon={Ticket}
+          description="tickets actifs"
+        />
         <StatsCard
           label={
-            isAgent(user.role)
-              ? "Mes tickets en retard"
-              : "Tickets en retard"
+            isAgent(user.role) ? "Mes tickets en retard" : "Tickets en retard"
           }
           value={stats.overdueCount}
           tone="warning"
+          icon={AlertCircle}
+          description="dépassement SLA"
         />
         <StatsCard
           label="Tickets résolus"
           value={stats.resolvedInPeriodCount}
           tone="success"
+          icon={CheckCircle2}
+          description="sur la période"
         />
       </div>
 
-      <div className="mt-8 grid gap-4 lg:grid-cols-2">
-        <div className="card bg-base-100 shadow-md">
-          <div className="card-body">
-            <h2 className="card-title text-lg">Activité récente</h2>
-            <p className="text-sm text-base-content/60">
-              Les flux temps réel arriveront avec l&apos;API backend. En mode
-              démo, les mutations restent visibles pendant la session.
-            </p>
-          </div>
-        </div>
-        <div className="card bg-base-100 shadow-md">
-          <div className="card-body">
-            <h2 className="card-title text-lg">Répartition</h2>
-            <p className="text-sm text-base-content/60">
-              {isAdmin(user.role)
-                ? "Vue globale administrateur — tous les compteurs."
-                : "Vue personnalisée selon vos droits d'accès."}
-            </p>
-          </div>
-        </div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <PanelSection title="Activité récente">
+          <p className="text-page-desc">
+            Les flux temps réel arriveront avec l&apos;API backend. En mode démo,
+            les mutations restent visibles pendant la session.
+          </p>
+        </PanelSection>
+        <PanelSection title="Répartition">
+          <p className="text-page-desc">
+            {isAdmin(user.role)
+              ? "Vue globale administrateur — tous les compteurs."
+              : "Vue personnalisée selon vos droits d'accès."}
+          </p>
+        </PanelSection>
       </div>
     </div>
   );

@@ -1,0 +1,225 @@
+/*
+ * MSK Ticket Support — Design Tokens
+ * ───────────────────────────────────
+ * Source de vérité couleurs : thème DaisyUI "msk" dans app/app.css (oklch).
+ * Ce fichier documente les alias sémantiques, la typo et l'espacement.
+ *
+ * NEUTRES (hex de référence)
+ *   bg        #EDF1FE  base-200   fond app
+ *   surface   #F9FBFE  base-100   cartes, tableaux
+ *   border    #DEE3F9  base-300   séparateurs
+ *   text      #23273C  base-content
+ *
+ * SÉMANTIQUE (hex de référence)
+ *   primary   #5E6AE2  actions, admin
+ *   secondary #AA94E7  agent
+ *   accent    #00ADE4  réouvert
+ *   info      #47A1DA  ouvert, client
+ *   success   #4DAF68  résolu, SLA OK
+ *   warning   #E6B542  en cours
+ *   error     #E54243  en retard, haute priorité
+ */
+
+:root {
+  /* ── Surfaces ── */
+  --msk-bg: var(--color-base-200);
+  --msk-surface: var(--color-base-100);
+  --msk-border: var(--color-base-300);
+  --msk-border-subtle: color-mix(in oklch, var(--color-base-300) 50%, transparent);
+
+  /* ── Texte ── */
+  --msk-text: var(--color-base-content);
+  --msk-text-secondary: color-mix(in oklch, var(--color-base-content) 55%, transparent);
+  --msk-text-muted: color-mix(in oklch, var(--color-base-content) 40%, transparent);
+
+  /* ── Badge : fond 12 % / texte plein ── */
+  --msk-badge-primary-bg: color-mix(in oklch, var(--color-primary) 12%, transparent);
+  --msk-badge-primary-fg: var(--color-primary);
+  --msk-badge-secondary-bg: color-mix(in oklch, var(--color-secondary) 12%, transparent);
+  --msk-badge-secondary-fg: var(--color-secondary);
+  --msk-badge-accent-bg: color-mix(in oklch, var(--color-accent) 12%, transparent);
+  --msk-badge-accent-fg: var(--color-accent);
+  --msk-badge-info-bg: color-mix(in oklch, var(--color-info) 12%, transparent);
+  --msk-badge-info-fg: var(--color-info);
+  --msk-badge-success-bg: color-mix(in oklch, var(--color-success) 12%, transparent);
+  --msk-badge-success-fg: var(--color-success);
+  --msk-badge-warning-bg: color-mix(in oklch, var(--color-warning) 15%, transparent);
+  --msk-badge-warning-fg: var(--color-warning);
+  --msk-badge-error-bg: color-mix(in oklch, var(--color-error) 12%, transparent);
+  --msk-badge-error-fg: var(--color-error);
+  --msk-badge-neutral-bg: color-mix(in oklch, var(--color-base-content) 8%, transparent);
+  --msk-badge-neutral-fg: color-mix(in oklch, var(--color-base-content) 65%, transparent);
+
+  /* ── Typographie ── */
+  --msk-text-page-title-size: 1.5rem;
+  --msk-text-page-title-weight: 600;
+  --msk-text-page-title-leading: 1.25;
+
+  --msk-text-page-desc-size: 0.875rem;
+  --msk-text-page-desc-weight: 400;
+  --msk-text-page-desc-leading: 1.5;
+
+  --msk-text-stat-value-size: 1.75rem;
+  --msk-text-stat-value-weight: 700;
+  --msk-text-stat-value-leading: 1.1;
+
+  --msk-text-stat-label-size: 0.75rem;
+  --msk-text-stat-label-weight: 500;
+  --msk-text-stat-label-leading: 1.4;
+
+  --msk-text-col-header-size: 0.75rem;
+  --msk-text-col-header-weight: 600;
+  --msk-text-col-header-leading: 1.4;
+
+  --msk-text-cell-primary-size: 0.875rem;
+  --msk-text-cell-primary-weight: 500;
+  --msk-text-cell-primary-leading: 1.4;
+
+  --msk-text-cell-secondary-size: 0.75rem;
+  --msk-text-cell-secondary-weight: 400;
+  --msk-text-cell-secondary-leading: 1.4;
+
+  --msk-text-cell-data-size: 0.875rem;
+  --msk-text-cell-data-weight: 400;
+  --msk-text-cell-data-leading: 1.4;
+
+  --msk-text-action-size: 0.75rem;
+  --msk-text-action-weight: 600;
+  --msk-text-action-leading: 1.4;
+
+  /* ── Espacement (grille 4px) ── */
+  --msk-space-1: 0.25rem;  /*  4px */
+  --msk-space-2: 0.5rem;   /*  8px */
+  --msk-space-3: 0.75rem;  /* 12px */
+  --msk-space-4: 1rem;     /* 16px */
+  --msk-space-6: 1.5rem;   /* 24px */
+  --msk-space-8: 2rem;     /* 32px */
+
+  /* ── Tableau ── */
+  --msk-table-row-height: 4.25rem;
+  --msk-avatar-size: 2.25rem;
+}
+
+/* ── Classes utilitaires typographie ── */
+
+.text-page-title {
+  font-size: var(--msk-text-page-title-size);
+  font-weight: var(--msk-text-page-title-weight);
+  line-height: var(--msk-text-page-title-leading);
+}
+
+.text-page-desc {
+  font-size: var(--msk-text-page-desc-size);
+  font-weight: var(--msk-text-page-desc-weight);
+  line-height: var(--msk-text-page-desc-leading);
+  color: var(--msk-text-secondary);
+}
+
+.text-stat-value {
+  font-size: var(--msk-text-stat-value-size);
+  font-weight: var(--msk-text-stat-value-weight);
+  line-height: var(--msk-text-stat-value-leading);
+  font-variant-numeric: tabular-nums;
+}
+
+.text-stat-label {
+  font-size: var(--msk-text-stat-label-size);
+  font-weight: var(--msk-text-stat-label-weight);
+  line-height: var(--msk-text-stat-label-leading);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--msk-text-muted);
+}
+
+.text-col-header {
+  font-size: var(--msk-text-col-header-size);
+  font-weight: var(--msk-text-col-header-weight);
+  line-height: var(--msk-text-col-header-leading);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--msk-text-muted);
+}
+
+.text-cell-primary {
+  font-size: var(--msk-text-cell-primary-size);
+  font-weight: var(--msk-text-cell-primary-weight);
+  line-height: var(--msk-text-cell-primary-leading);
+  color: var(--msk-text);
+}
+
+.text-cell-secondary {
+  font-size: var(--msk-text-cell-secondary-size);
+  font-weight: var(--msk-text-cell-secondary-weight);
+  line-height: var(--msk-text-cell-secondary-leading);
+  color: var(--msk-text-secondary);
+}
+
+.text-cell-data {
+  font-size: var(--msk-text-cell-data-size);
+  font-weight: var(--msk-text-cell-data-weight);
+  line-height: var(--msk-text-cell-data-leading);
+  color: var(--msk-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.text-action {
+  font-size: var(--msk-text-action-size);
+  font-weight: var(--msk-text-action-weight);
+  line-height: var(--msk-text-action-leading);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-primary);
+}
+
+/* ── Badge pill (variantes sémantiques) ── */
+
+.msk-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.msk-badge-primary {
+  background: var(--msk-badge-primary-bg);
+  color: var(--msk-badge-primary-fg);
+}
+
+.msk-badge-secondary {
+  background: var(--msk-badge-secondary-bg);
+  color: var(--msk-badge-secondary-fg);
+}
+
+.msk-badge-accent {
+  background: var(--msk-badge-accent-bg);
+  color: var(--msk-badge-accent-fg);
+}
+
+.msk-badge-info {
+  background: var(--msk-badge-info-bg);
+  color: var(--msk-badge-info-fg);
+}
+
+.msk-badge-success {
+  background: var(--msk-badge-success-bg);
+  color: var(--msk-badge-success-fg);
+}
+
+.msk-badge-warning {
+  background: var(--msk-badge-warning-bg);
+  color: var(--msk-badge-warning-fg);
+}
+
+.msk-badge-error {
+  background: var(--msk-badge-error-bg);
+  color: var(--msk-badge-error-fg);
+}
+
+.msk-badge-neutral {
+  background: var(--msk-badge-neutral-bg);
+  color: var(--msk-badge-neutral-fg);
+}

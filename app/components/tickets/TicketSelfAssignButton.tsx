@@ -17,8 +17,8 @@ export function TicketSelfAssignButton() {
             <UserPlus className="size-5" />
           </div>
           <div className="space-y-1">
-            <p className="font-semibold text-base-content">Prendre en charge</p>
-            <p className="text-sm leading-relaxed text-base-content/65">
+            <p className="panel-section-title">Prendre en charge</p>
+            <p className="panel-section-desc">
               Ce ticket est disponible dans le pool. Assignez-le à vous-même pour
               répondre au client et faire évoluer son statut.
             </p>

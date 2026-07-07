@@ -23,7 +23,7 @@ export default function NewTicketPage() {
   const actionData = useActionData<typeof action>();
 
   return (
-    <div>
+    <div className="page-stack">
       <PageHeader
         title="Nouveau ticket"
         description="Créez une demande de support en quelques étapes."

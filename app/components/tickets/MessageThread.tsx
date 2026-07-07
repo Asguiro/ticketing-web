@@ -1,6 +1,7 @@
 import { AlertCircle, Loader2, RotateCcw } from "lucide-react";
 import { useEffect, useMemo, useRef } from "react";
 
+import { PersonAvatar } from "~/components/shared/PersonAvatar";
 import { ROLE_LABELS } from "~/lib/roles";
 import type { TicketMessage } from "~/types/ticket";
 import type { OptimisticMessage } from "~/components/tickets/useTicketMessageSend";
@@ -37,10 +38,6 @@ function formatMessageTime(dateString: string) {
   });
 }
 
-function getInitials(email: string) {
-  return email.slice(0, 2).toUpperCase();
-}
-
 export function MessageThread({
   messages,
   currentUserId,
@@ -65,12 +62,18 @@ export function MessageThread({
 
   if (messages.length === 0) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 text-center">
-        <div className="mb-3 flex size-14 items-center justify-center rounded-full bg-base-200">
+      <div
+        className="flex flex-1 flex-col items-center justify-center text-center"
+        style={{ padding: "var(--msk-space-8) var(--msk-space-6)" }}
+      >
+        <div
+          className="mb-3 flex items-center justify-center rounded-full bg-base-200"
+          style={{ width: "3.5rem", height: "3.5rem" }}
+        >
           <span className="text-2xl">💬</span>
         </div>
-        <p className="text-sm font-medium text-base-content">Aucun message</p>
-        <p className="mt-1 text-xs text-base-content/50">
+        <p className="text-cell-primary">Aucun message</p>
+        <p className="mt-1 text-cell-secondary">
           Démarrez la conversation en envoyant un premier message.
         </p>
       </div>
@@ -78,7 +81,10 @@ export function MessageThread({
   }
 
   return (
-    <div className="flex-1 space-y-4 overflow-y-auto px-4 py-5 sm:px-6">
+    <div
+      className="flex-1 space-y-4 overflow-y-auto"
+      style={{ padding: "var(--msk-space-4) var(--msk-space-4)" }}
+    >
       {messages.map((message) => {
         const isOwn = message.authorId === currentUserId;
         const authorEmail = message.author?.email ?? message.authorId;
@@ -93,17 +99,7 @@ export function MessageThread({
               isOwn ? "flex-row-reverse" : "flex-row"
             } ${isSending ? "opacity-80" : "opacity-100"}`}
           >
-            <div className="avatar placeholder shrink-0">
-              <div
-                className={`flex size-9 items-center justify-center rounded-full text-xs font-semibold ${
-                  isOwn
-                    ? "bg-primary text-primary-content"
-                    : "bg-base-300 text-base-content"
-                }`}
-              >
-                {getInitials(authorEmail)}
-              </div>
-            </div>
+            <PersonAvatar email={authorEmail} />
 
             <div
               className={`flex max-w-[min(75%,28rem)] flex-col gap-1 ${
@@ -115,13 +111,11 @@ export function MessageThread({
                   isOwn ? "flex-row-reverse" : "flex-row"
                 }`}
               >
-                <span className="text-xs font-semibold text-base-content">
+                <span className="text-cell-primary">
                   {isOwn ? "Vous" : authorEmail}
                 </span>
                 {authorRole && !isOwn ? (
-                  <span className="text-[10px] uppercase tracking-wide text-base-content/40">
-                    {ROLE_LABELS[authorRole]}
-                  </span>
+                  <span className="text-col-header">{ROLE_LABELS[authorRole]}</span>
                 ) : null}
               </div>
 
@@ -146,22 +140,19 @@ export function MessageThread({
                   isOwn ? "justify-end" : "justify-start"
                 }`}
               >
-                <time
-                  dateTime={message.createdAt}
-                  className="text-[11px] text-base-content/40"
-                >
+                <time dateTime={message.createdAt} className="text-cell-secondary">
                   {formatMessageTime(message.createdAt)}
                 </time>
 
                 {isSending ? (
-                  <span className="inline-flex items-center gap-1 text-[11px] text-base-content/50">
+                  <span className="inline-flex items-center gap-1 text-cell-secondary">
                     <Loader2 className="size-3 animate-spin" />
                     Envoi…
                   </span>
                 ) : null}
 
                 {isFailed ? (
-                  <span className="inline-flex items-center gap-1 text-[11px] text-error">
+                  <span className="inline-flex items-center gap-1 text-xs text-error">
                     <AlertCircle className="size-3" />
                     {message.deliveryError ?? "Échec de l'envoi"}
                   </span>

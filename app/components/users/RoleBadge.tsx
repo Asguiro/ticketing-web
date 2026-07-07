@@ -1,20 +1,29 @@
+import { Badge, type BadgeVariant } from "~/components/ui/Badge";
 import { ROLE_LABELS } from "~/lib/roles";
 import type { Role } from "~/types/user";
 
 type RoleBadgeProps = {
   role: Role;
+  variant?: "default" | "pill";
 };
 
-const ROLE_BADGE_CLASSES: Record<Role, string> = {
-  CLIENT: "badge-info",
-  AGENT: "badge-secondary",
-  ADMIN: "badge-primary",
+const ROLE_VARIANTS: Record<Role, BadgeVariant> = {
+  CLIENT: "info",
+  AGENT: "secondary",
+  ADMIN: "primary",
 };
 
-export function RoleBadge({ role }: RoleBadgeProps) {
+export function RoleBadge({ role, variant = "default" }: RoleBadgeProps) {
+  const label = ROLE_LABELS[role];
+  const badgeVariant = ROLE_VARIANTS[role];
+
+  if (variant === "pill") {
+    return <Badge variant={badgeVariant}>{label}</Badge>;
+  }
+
   return (
-    <span className={`badge ${ROLE_BADGE_CLASSES[role]}`}>
-      {ROLE_LABELS[role]}
-    </span>
+    <Badge variant={badgeVariant} appearance="solid">
+      {label}
+    </Badge>
   );
 }

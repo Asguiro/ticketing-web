@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
+import { Badge } from "~/components/ui/Badge";
 import { MessageComposer } from "~/components/tickets/MessageComposer";
 import { MessageThread } from "~/components/tickets/MessageThread";
 import { useTicketChat } from "~/components/tickets/useTicketChat";
@@ -115,35 +116,31 @@ export function TicketChatSection({
     return [...messages, ...optimisticMessages];
   }, [messages, optimistic, user.email, user.id, user.role]);
 
+  const connectionBadge = isRealtime ? (
+    isConnected ? (
+      <Badge variant="success">Temps réel actif</Badge>
+    ) : connectionError ? (
+      <Badge variant="error">{connectionError}</Badge>
+    ) : (
+      <Badge variant="neutral">Connexion…</Badge>
+    )
+  ) : null;
+
   return (
-    <section className="card overflow-hidden bg-base-100 shadow-md">
-      <div className="border-b border-base-300/60 px-5 py-4">
+    <section className="panel-section">
+      <div className="panel-section-header">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
-            <h2 className="text-base font-semibold text-base-content">Discussion</h2>
-            <p className="mt-1 text-xs text-base-content/50">
+            <h2 className="panel-section-title">Discussion</h2>
+            <p className="panel-section-desc">
               Échangez avec{" "}
               {isAgent(user.role) || isAdmin(user.role) ? "le client" : "l'équipe support"}
             </p>
           </div>
-          {isRealtime ? (
-            <span
-              className={`badge badge-sm ${
-                isConnected
-                  ? "badge-success"
-                  : connectionError
-                    ? "badge-error"
-                    : "badge-ghost"
-              }`}
-            >
-              {isConnected
-                ? "Temps réel actif"
-                : connectionError ?? "Connexion..."}
-            </span>
-          ) : null}
+          {connectionBadge}
         </div>
         {ticketStatus === "REOPENED" ? (
-          <p className="mt-3 text-xs text-warning">
+          <p className="mt-3 text-cell-secondary text-warning">
             Ce ticket a été réouvert suite à votre message.
           </p>
         ) : null}

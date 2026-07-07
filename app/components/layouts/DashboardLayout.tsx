@@ -17,14 +17,14 @@ export default function DashboardLayout() {
   const isNavigating = navigation.state === "loading";
 
   return (
-    <div className="flex h-screen overflow-hidden bg-base-200 p-3 lg:p-4">
-      <div className="mx-auto flex min-h-0 w-full max-w-[1400px] flex-col gap-3 lg:flex-row lg:gap-4">
+    <div className="flex h-screen overflow-hidden bg-base-200 p-2 lg:p-3">
+      <div className="mx-auto flex min-h-0 w-full max-w-[1920px] flex-col gap-2 lg:flex-row lg:gap-3">
         <AppSidebar user={user} />
 
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           {isMockMode ? <MockModeBanner /> : null}
 
-          <main className="glass-panel min-h-0 flex-1 overflow-y-auto p-5 lg:p-8">
+          <main className="glass-panel min-h-0 flex-1 overflow-y-auto" style={{ padding: "var(--msk-space-4)" }}>
             <NavigationLoadingIndicator />
             <div
               className={

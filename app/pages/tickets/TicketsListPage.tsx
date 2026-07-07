@@ -30,7 +30,7 @@ export default function TicketsListPage() {
   const inProgressCount = tickets.length - resolvedCount;
 
   return (
-    <div className="space-y-6">
+    <div className="page-stack">
       <PageHeader
         title="Tickets"
         description={
@@ -42,43 +42,54 @@ export default function TicketsListPage() {
 
       {adminView ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="stat rounded-box bg-base-100 shadow-md">
+          <div className="stat stat-card">
             <div className="stat-figure text-primary">
               <Ticket className="size-6" />
             </div>
-            <div className="stat-title">Total</div>
-            <div className="stat-value text-2xl">{pagination.total}</div>
-            <div className="stat-desc">tickets au total</div>
+            <div className="text-stat-label">Total</div>
+            <div className="text-stat-value text-base-content">{pagination.total}</div>
+            <div className="stat-card-desc">tickets au total</div>
           </div>
-          <div className="stat rounded-box bg-base-100 shadow-md">
+          <div className="stat stat-card">
             <div className="stat-figure text-warning">
               <AlertCircle className="size-6" />
             </div>
-            <div className="stat-title">En cours</div>
-            <div className="stat-value text-2xl text-warning">{inProgressCount}</div>
-            <div className="stat-desc">sur cette page</div>
+            <div className="text-stat-label">En cours</div>
+            <div className="text-stat-value text-warning">{inProgressCount}</div>
+            <div className="stat-card-desc">sur cette page</div>
           </div>
-          <div className="stat rounded-box bg-base-100 shadow-md">
+          <div className="stat stat-card">
             <div className="stat-figure text-success">
               <CheckCircle2 className="size-6" />
             </div>
-            <div className="stat-title">Résolus</div>
-            <div className="stat-value text-2xl text-success">{resolvedCount}</div>
-            <div className="stat-desc">sur cette page</div>
+            <div className="text-stat-label">Résolus</div>
+            <div className="text-stat-value text-success">{resolvedCount}</div>
+            <div className="stat-card-desc">sur cette page</div>
           </div>
-          <div className="stat rounded-box bg-base-100 shadow-md">
-            <div className="stat-figure text-warning">
+          <div className="stat stat-card">
+            <div className="stat-figure text-base-content/40">
               <UserX className="size-6" />
             </div>
-            <div className="stat-title">Non assignés</div>
-            <div className="stat-value text-2xl">{unassignedCount}</div>
-            <div className="stat-desc">sur cette page</div>
+            <div className="text-stat-label">Non assignés</div>
+            <div className="text-stat-value text-base-content">{unassignedCount}</div>
+            <div className="stat-card-desc">sur cette page</div>
           </div>
         </div>
       ) : null}
 
-      <TicketFilters user={user} filters={filters} agents={agents} />
-      <TicketTable tickets={tickets} user={user} pagination={pagination} />
+      <TicketTable
+        tickets={tickets}
+        user={user}
+        pagination={pagination}
+        toolbar={
+          <TicketFilters
+            user={user}
+            filters={filters}
+            agents={agents}
+            embedded
+          />
+        }
+      />
     </div>
   );
 }

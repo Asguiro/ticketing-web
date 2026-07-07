@@ -11,7 +11,7 @@ export function Input({ label, error, id, className = "", ...props }: InputProps
   return (
     <label className="form-control w-full">
       <div className="label py-1">
-        <span className="label-text font-medium">{label}</span>
+        <span className="label-text text-col-header">{label}</span>
       </div>
       <input
         id={inputId}

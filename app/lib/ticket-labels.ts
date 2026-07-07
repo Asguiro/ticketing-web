@@ -1,3 +1,4 @@
+import type { BadgeVariant } from "~/components/ui/Badge";
 import type { TicketPriority, TicketStatus } from "~/types/ticket";
 
 export const STATUS_LABELS: Record<TicketStatus, string> = {
@@ -8,12 +9,20 @@ export const STATUS_LABELS: Record<TicketStatus, string> = {
   REOPENED: "Réouvert",
 };
 
-export const STATUS_BADGE_CLASSES: Record<TicketStatus, string> = {
-  OPEN: "badge-info",
-  IN_PROGRESS: "badge-warning",
-  RESOLVED: "badge-success",
-  CLOSED: "badge-neutral",
-  REOPENED: "badge-accent",
+export const STATUS_VARIANTS: Record<TicketStatus, BadgeVariant> = {
+  OPEN: "info",
+  IN_PROGRESS: "warning",
+  RESOLVED: "success",
+  CLOSED: "neutral",
+  REOPENED: "accent",
+};
+
+export const STATUS_DOT_CLASSES: Record<TicketStatus, string> = {
+  OPEN: "bg-info/70",
+  IN_PROGRESS: "bg-warning/70",
+  RESOLVED: "bg-success/70",
+  CLOSED: "bg-base-content/25",
+  REOPENED: "bg-accent/70",
 };
 
 export const PRIORITY_LABELS: Record<TicketPriority, string> = {
@@ -22,10 +31,16 @@ export const PRIORITY_LABELS: Record<TicketPriority, string> = {
   HIGH: "Haute",
 };
 
-export const PRIORITY_BADGE_CLASSES: Record<TicketPriority, string> = {
-  LOW: "badge-neutral",
-  MEDIUM: "badge-warning",
-  HIGH: "badge-error",
+export const PRIORITY_VARIANTS: Record<TicketPriority, BadgeVariant> = {
+  LOW: "neutral",
+  MEDIUM: "warning",
+  HIGH: "error",
+};
+
+export const PRIORITY_TEXT_CLASSES: Record<TicketPriority, string> = {
+  LOW: "text-base-content/60",
+  MEDIUM: "text-base-content/75",
+  HIGH: "font-medium text-base-content",
 };
 
 export const STATUS_FILTER_OPTIONS = [

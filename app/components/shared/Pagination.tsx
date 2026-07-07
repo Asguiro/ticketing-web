@@ -6,6 +6,7 @@ type PaginationProps = {
   totalPages: number;
   total: number;
   itemLabel?: string;
+  embedded?: boolean;
 };
 
 function buildPageUrl(search: string, page: number): string {
@@ -19,6 +20,7 @@ export function Pagination({
   totalPages,
   total,
   itemLabel = "éléments",
+  embedded = false,
 }: PaginationProps) {
   const location = useLocation();
 
@@ -31,8 +33,12 @@ export function Pagination({
   const to = Math.min(page * pageSize, total);
 
   return (
-    <div className="flex flex-col gap-3 border-t border-base-300/60 pt-4 sm:flex-row sm:items-center sm:justify-between">
-      <p className="text-sm text-base-content/60">
+    <div
+      className={`flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between ${
+        embedded ? "" : "border-t border-base-300/60 pt-4"
+      }`}
+    >
+      <p className="text-page-desc">
         {total} {itemLabel} — page {page} sur {totalPages}
         {total > 0 ? ` (${from}–${to})` : ""}
       </p>

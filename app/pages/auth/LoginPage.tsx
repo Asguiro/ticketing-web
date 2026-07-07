@@ -2,6 +2,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { Form, useActionData, useLoaderData, useNavigation } from "react-router";
 import { Ticket } from "lucide-react";
 
+import { StatsCard } from "~/components/dashboard/StatsCard";
 import { Input } from "~/components/ui/Input";
 import { AppRouteErrorBoundary } from "~/components/shared/AppRouteErrorBoundary";
 import { Button } from "~/components/ui/Button";
@@ -28,42 +29,45 @@ export default function LoginPage() {
     (actionData && "error" in actionData ? actionData.error : null) ?? error;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-base-200 p-4">
+    <div
+      className="flex min-h-screen items-center justify-center bg-base-200"
+      style={{ padding: "var(--msk-space-4)" }}
+    >
       <div className="grid w-full max-w-5xl gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <section className="glass-panel hidden flex-col justify-between p-8 lg:flex">
+        <section
+          className="glass-panel hidden flex-col justify-between lg:flex"
+          style={{ padding: "var(--msk-space-8)" }}
+        >
           <div>
-            <p className="text-xs font-semibold tracking-[0.25em] text-primary">
-              MSK CREATION
-            </p>
-            <h1 className="mt-4 text-4xl font-bold leading-tight">
+            <p className="text-col-header text-primary">MSK CREATION</p>
+            <h1 className="mt-4 text-page-title">
               Plateforme de support
               <span className="block text-primary">tickets & SLA</span>
             </h1>
-            <p className="mt-4 max-w-md text-sm text-base-content/70">
-              Interface inspirée d&apos;un dashboard business moderne — sidebar,
-              cartes stats et panneaux doux, personnalisable au fil du projet.
+            <p className="mt-4 max-w-md text-page-desc">
+              Gestion de tickets client, agent et administrateur — suivi SLA,
+              assignation et messagerie intégrée.
             </p>
           </div>
-          <div className="stat-gradient-card rounded-box p-6">
-            <div className="flex items-center gap-3">
-              <Ticket className="size-8" />
-              <div>
-                <p className="text-sm text-white/80">Tickets ouverts (démo)</p>
-                <p className="text-3xl font-bold">12</p>
-              </div>
-            </div>
-          </div>
+          <StatsCard
+            label="Tickets ouverts (démo)"
+            value={12}
+            icon={Ticket}
+            description="exemple de carte stat"
+          />
         </section>
 
-        <section className="card bg-base-100 shadow-xl">
-          <div className="card-body">
-            <h2 className="card-title text-2xl">Connexion</h2>
-            <p className="text-sm text-base-content/60">
+        <section className="panel-section">
+          <div className="panel-section-header">
+            <h2 className="text-page-title">Connexion</h2>
+            <p className="mt-1 text-page-desc">
               Accédez à votre espace client, agent ou administrateur.
             </p>
+          </div>
 
+          <div className="panel-section-body">
             {isMockMode ? (
-              <div className="alert alert-info mt-4">
+              <div className="alert alert-info">
                 <div className="text-sm">
                   <p className="font-medium">Mode démo actif</p>
                   <ul className="mt-2 space-y-1">

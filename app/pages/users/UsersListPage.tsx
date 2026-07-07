@@ -29,7 +29,7 @@ export default function UsersListPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="page-stack">
       <PageHeader
         title="Utilisateurs"
         description="Gestion des comptes client, agent et administrateur."
@@ -42,42 +42,45 @@ export default function UsersListPage() {
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="stat rounded-box bg-base-100 shadow-md">
+        <div className="stat stat-card">
           <div className="stat-figure text-primary">
             <Users className="size-6" />
           </div>
-          <div className="stat-title">Total</div>
-          <div className="stat-value text-2xl">{pagination.total}</div>
-          <div className="stat-desc">comptes enregistrés</div>
+          <div className="text-stat-label">Total</div>
+          <div className="text-stat-value text-base-content">{pagination.total}</div>
+          <div className="stat-card-desc">comptes enregistrés</div>
         </div>
-        <div className="stat rounded-box bg-base-100 shadow-md">
+        <div className="stat stat-card">
           <div className="stat-figure text-info">
             <Users className="size-6" />
           </div>
-          <div className="stat-title">{ROLE_LABELS.CLIENT}s</div>
-          <div className="stat-value text-2xl text-info">{roleCounts.client}</div>
-          <div className="stat-desc">sur cette page</div>
+          <div className="text-stat-label">{ROLE_LABELS.CLIENT}s</div>
+          <div className="text-stat-value text-info">{roleCounts.client}</div>
+          <div className="stat-card-desc">sur cette page</div>
         </div>
-        <div className="stat rounded-box bg-base-100 shadow-md">
+        <div className="stat stat-card">
           <div className="stat-figure text-secondary">
             <UserCog className="size-6" />
           </div>
-          <div className="stat-title">{ROLE_LABELS.AGENT}s</div>
-          <div className="stat-value text-2xl text-secondary">{roleCounts.agent}</div>
-          <div className="stat-desc">sur cette page</div>
+          <div className="text-stat-label">{ROLE_LABELS.AGENT}s</div>
+          <div className="text-stat-value text-secondary">{roleCounts.agent}</div>
+          <div className="stat-card-desc">sur cette page</div>
         </div>
-        <div className="stat rounded-box bg-base-100 shadow-md">
+        <div className="stat stat-card">
           <div className="stat-figure text-primary">
             <Shield className="size-6" />
           </div>
-          <div className="stat-title">{ROLE_LABELS.ADMIN}s</div>
-          <div className="stat-value text-2xl">{roleCounts.admin}</div>
-          <div className="stat-desc">sur cette page</div>
+          <div className="text-stat-label">{ROLE_LABELS.ADMIN}s</div>
+          <div className="text-stat-value text-base-content">{roleCounts.admin}</div>
+          <div className="stat-card-desc">sur cette page</div>
         </div>
       </div>
 
-      <UserFilters filters={filters} total={pagination.total} />
-      <UserTable users={users} pagination={pagination} />
+      <UserTable
+        users={users}
+        pagination={pagination}
+        toolbar={<UserFilters filters={filters} embedded />}
+      />
     </div>
   );
 }

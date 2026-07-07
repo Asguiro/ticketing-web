@@ -2,6 +2,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs, ShouldRevalidateFunctionAr
 import { useActionData, useLoaderData } from "react-router";
 import { useEffect, useState } from "react";
 
+import { OverdueBadge } from "~/components/dashboard/OverdueBadge";
 import { AssignAgentSelect } from "~/components/tickets/AssignAgentSelect";
 import { PriorityBadge } from "~/components/tickets/PriorityBadge";
 import { StatusBadge } from "~/components/tickets/StatusBadge";
@@ -9,10 +10,13 @@ import { StatusHistoryTimeline } from "~/components/tickets/StatusHistoryTimelin
 import { TicketAgentActionsPanel } from "~/components/tickets/TicketAgentActionsPanel";
 import { TicketChatSection } from "~/components/tickets/TicketChatSection";
 import { PageHeader } from "~/components/shared/PageHeader";
+import { PanelSection } from "~/components/shared/PanelSection";
+import { PersonCell } from "~/components/shared/PersonCell";
+import { Badge } from "~/components/ui/Badge";
 import { AppRouteErrorBoundary } from "~/components/shared/AppRouteErrorBoundary";
 import { PageLoadingSkeleton } from "~/components/shared/PageLoadingSkeleton";
+import { formatDateTime } from "~/lib/date-format";
 import { isAdmin, isAgent } from "~/lib/roles";
-import { formatPersonName } from "~/lib/user-display";
 import {
   getAdminAllowedTargets,
   getAgentAllowedTargets,
@@ -70,7 +74,7 @@ export default function TicketDetailPage() {
   }, [ticket.status]);
 
   return (
-    <div className="space-y-6">
+    <div className="page-stack">
       <PageHeader title={ticket.title} description={ticket.description} />
 
       {actionData &&
@@ -84,34 +88,35 @@ export default function TicketDetailPage() {
       ) : null}
 
       <div className="flex flex-wrap items-center gap-3">
-        <StatusBadge status={ticketStatus} />
-        <PriorityBadge priority={ticket.priority} />
-        {ticket.isLate ? (
-          <span className="badge badge-error">En retard</span>
-        ) : null}
+        <StatusBadge status={ticketStatus} variant="pill" />
+        <PriorityBadge priority={ticket.priority} variant="pill" />
+        {ticket.isLate ? <OverdueBadge /> : null}
         {ticket.deadline ? (
-          <span className="text-xs text-base-content/60">
-            SLA : {new Date(ticket.deadline).toLocaleString("fr-FR")}
+          <span className="text-cell-secondary">
+            Échéance : {formatDateTime(ticket.deadline)}
           </span>
         ) : null}
       </div>
 
       {(isAgent(user.role) || isAdmin(user.role)) && ticket.client ? (
-        <div className="text-sm text-base-content/70">
-          Client :{" "}
-          <span className="font-medium text-base-content">
-            {formatPersonName(ticket.client)}
-          </span>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <PersonCell
+            email={ticket.client.email}
+            firstName={ticket.client.firstName}
+            lastName={ticket.client.lastName}
+            secondary="Client"
+          />
           {ticket.assignedAgent ? (
-            <>
-              {" "}
-              · Agent :{" "}
-              <span className="font-medium text-base-content">
-                {formatPersonName(ticket.assignedAgent)}
-              </span>
-            </>
+            <PersonCell
+              email={ticket.assignedAgent.email}
+              firstName={ticket.assignedAgent.firstName}
+              lastName={ticket.assignedAgent.lastName}
+              secondary="Agent assigné"
+            />
           ) : (
-            <span className="text-base-content/50"> · Non assigné</span>
+            <div className="cell-content">
+              <Badge variant="neutral">Non assigné</Badge>
+            </div>
           )}
         </div>
       ) : null}
@@ -128,20 +133,15 @@ export default function TicketDetailPage() {
       )}
 
       {isAdmin(user.role) ? (
-        <section className="overflow-hidden rounded-box border border-base-300/60 bg-base-100 shadow-md">
-          <div className="border-b border-base-300/60 px-5 py-4">
-            <h2 className="text-base font-semibold text-base-content">Assignation</h2>
-            <p className="mt-0.5 text-xs text-base-content/55">
-              Désigner l&apos;agent responsable du ticket
-            </p>
-          </div>
-          <div className="p-5">
-            <AssignAgentSelect
-              agents={agents}
-              currentAgentId={ticket.assignedAgentId}
-            />
-          </div>
-        </section>
+        <PanelSection
+          title="Assignation"
+          description="Désigner l'agent responsable du ticket"
+        >
+          <AssignAgentSelect
+            agents={agents}
+            currentAgentId={ticket.assignedAgentId}
+          />
+        </PanelSection>
       ) : null}
 
       <TicketChatSection
@@ -156,12 +156,9 @@ export default function TicketDetailPage() {
         onStatusChange={setTicketStatus}
       />
 
-      <section className="card bg-base-100 shadow-md">
-        <div className="card-body gap-4">
-          <h2 className="card-title text-base">Historique des statuts</h2>
-          <StatusHistoryTimeline history={history} />
-        </div>
-      </section>
+      <PanelSection title="Historique des statuts">
+        <StatusHistoryTimeline history={history} />
+      </PanelSection>
     </div>
   );
 }
