@@ -202,6 +202,12 @@ Tester en **navigation privée** :
 - [ ] Déconnexion et redirection vers login
 - [ ] Aucune bannière « mode mock » (`MOCK_API` doit être `false`)
 
+### Erreur build `ERESOLVE` / peer dependency `@react-router/dev@7`
+
+`@vercel/react-router` déclare encore des peer dependencies React Router v7 alors que le
+projet utilise v8. Le fichier `.npmrc` à la racine force `legacy-peer-deps=true` pour que
+`npm install` passe sur Vercel comme en local.
+
 ### Erreur 500 `FUNCTION_INVOCATION_FAILED`
 
 Cause la plus fréquente : **`SESSION_SECRET` manquant** sur Vercel. Sans cette variable,
